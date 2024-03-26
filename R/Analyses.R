@@ -16,7 +16,7 @@ library(survcomp)
 
 
 #reading the csv file with the data
-df<- read.csv("/Users/quincy/Documents/Research/Rutgers/TDA/paper/Prism_Stats.csv" ,header=TRUE)
+df<- read.csv("/path/to/.csv" ,header=TRUE)
 #which(is.na(df))
 
 # remove certain unwanted columns
@@ -26,7 +26,7 @@ dff1 <- df[colMeans(is.na(df)) <= 0.1 & colMeans((df == 0), na.rm = T) <= 0.1]
 dff1<-df
 dff1[is.na(dff1)] <- 0
 
-#Univariate Analysis
+#####Univariate Analysis#####
 explanatory_vars <- c(colnames(dff1)[1:74])
 
 explanatory_vars %>% str_c("Death_1yr ~ ", .)
@@ -57,10 +57,10 @@ models <- explanatory_vars %>%       # begin with variables of interest
 #Summary
 models
 summary(models)
-write.csv(models, file="/Users/quincy/Documents/Research/Rutgers/TDA/paper/Univariate.csv")
+write.csv(models, file="path/to/.csv")
 
 
-#Multivariate Analysis
+#####Multivariate Analysis#####
 logistic_model <- glm(Death_1yr ~Groups+E.e..septal..112.,
                       data = dff1,
                       family=binomial)
@@ -73,16 +73,11 @@ summary(logistic_model)
 require(MASS)
 exp(cbind(coef(logistic_model), confint(logistic_model)))
 
-#write.csv(models, file="/Users/quincy/Documents/Research/Rutgers/TDA/paper/Univariate.csv")
+#write.csv(models, file="path/to/.csv")
 
 
 
-######HF Risk Prediction#####
-##Training/Testing Split##
-#set.seed(100)
-#index <- createDataPartition(final$HF, p = 0.6, list = FALSE)
-#train <- final[index, ]
-#test <- final[-index, ]
+#####HF Risk Prediction#####
 
 ##COXPH Univariate Analysis##
 ##Univariate##
@@ -122,8 +117,8 @@ detach("package:mlr", unload = TRUE)
 ##Survial Models##
 coxDem <- coxph(Surv(Death_1yr_Time, Death_1yr)~Grace.score.at.6.months,data=dff1,x=TRUE,y=TRUE)
 coxDemFunc <- coxph(Surv(Death_1yr_Time, Death_1yr)~Grace.score.at.6.months+LV.GLS..166.,data=dff1,x=TRUE,y=TRUE)
-coxDemFuncOmics <- coxph(Surv(Death_1yr_Time, Death_1yr)~Grace.score.at.6.months+LV.GLS..166.+Group.C.Prob_NY,data=dff1,x=TRUE,y=TRUE)
-coxDemOmics <- coxph(Surv(Death_1yr_Time, Death_1yr)~Grace.score.at.6.months+Group.C.Prob_NY,data=dff1,x=TRUE,y=TRUE)
+coxDemFuncOmics <- coxph(Surv(Death_1yr_Time, Death_1yr)~Grace.score.at.6.months+LV.GLS..166.+Group.A.Prob_NY,data=dff1,x=TRUE,y=TRUE)
+coxDemOmics <- coxph(Surv(Death_1yr_Time, Death_1yr)~Grace.score.at.6.months+Group.A.Prob_NY,data=dff1,x=TRUE,y=TRUE)
 
 
 AUC=Score(list(coxDem,coxDemFunc, coxDemFuncOmics), formula=Surv(Death_1yr_Time, Death_1yr)~1,
@@ -169,7 +164,7 @@ ApparrentCindex <- pec::cindex(list("COXPH Dem"=coxDem,
 col = c("bisque", "coral", "burlywood", "chocolate")
 
 plot(ApparrentCindex, legend = FALSE, xlim=c(0,400), ylim=c(0.5,1.0), lwd = 5, col = col)
-write.csv(ApparrentCindex$AppCindex, file = "/Users/quincy/Documents/Research/Rutgers/TDA/paper/Concordance.csv")
+write.csv(ApparrentCindex$AppCindex, file = "path/to/.csv")
 
 
 #####Hazard Ratio#####
